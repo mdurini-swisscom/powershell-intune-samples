@@ -13,59 +13,7 @@ See LICENSE in the project root for license information.
 
 ####################################################
 
-Function Get-ApplePushNotificationCertificate(){
 
-<#
-.SYNOPSIS
-This function is used to get applecPushcNotificationcCertificate from the Graph API REST interface
-.DESCRIPTION
-The function connects to the Graph API Interface and gets a configured apple Push Notification Certificate
-.EXAMPLE
-Get-ApplePushNotificationCertificate
-Returns apple Push Notification Certificate configured in Intune
-.NOTES
-NAME: Get-ApplePushNotificationCertificate
-#>
-
-[cmdletbinding()]
-
-
-$graphApiVersion = "v1.0"
-$Resource = "devicemanagement/applePushNotificationCertificate"
-
-    try {
-
-    $uri = "https://graph.microsoft.com/$graphApiVersion/$($Resource)"
-    (Invoke-RestMethod -Uri $uri -Headers $authToken -Method Get)
-
-    }
-
-    catch {
-
-    $ex = $_.Exception
-
-        if(($ex.message).contains("404")){
-        
-        Write-Host "Resource Not Configured" -ForegroundColor Red
-        
-        }
-
-        else {
-
-        $errorResponse = $ex.Response.GetResponseStream()
-        $reader = New-Object System.IO.StreamReader($errorResponse)
-        $reader.BaseStream.Position = 0
-        $reader.DiscardBufferedData()
-        $responseBody = $reader.ReadToEnd();
-        Write-Host "Response content:`n$responseBody" -f Red
-        Write-Error "Request to $Uri failed with HTTP Status $($ex.Response.StatusCode) $($ex.Response.StatusDescription)"
-        write-host
-
-        }
-
-    }
-
-}
 
 ####################################################
 

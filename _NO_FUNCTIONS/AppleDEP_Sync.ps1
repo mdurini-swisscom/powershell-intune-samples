@@ -12,115 +12,11 @@ See LICENSE in the project root for license information.
 
 ####################################################
 
-Function Sync-AppleDEP(){
 
-<#
-.SYNOPSIS
-Sync Intune tenant to Apple DEP service
-.DESCRIPTION
-Intune automatically syncs with the Apple DEP service once every 24hrs. This function synchronises your Intune tenant with the Apple DEP service.
-.EXAMPLE
-Sync-AppleDEP
-.NOTES
-NAME: Sync-AppleDEP
-#>
-
-[cmdletbinding()]
-
-Param(
-[parameter(Mandatory=$true)]
-[string]$id
-)
-
-
-$graphApiVersion = "beta"
-$Resource = "deviceManagement/depOnboardingSettings/$id/syncWithAppleDeviceEnrollmentProgram"
-
-    try {
-
-        $SyncURI = "https://graph.microsoft.com/$graphApiVersion/$($resource)"
-        Invoke-RestMethod -Uri $SyncURI -Headers $authToken -Method Post
-
-        }
-    
-    catch {
-
-    $ex = $_.Exception
-    $errorResponse = $ex.Response.GetResponseStream()
-    $reader = New-Object System.IO.StreamReader($errorResponse)
-    $reader.BaseStream.Position = 0
-    $reader.DiscardBufferedData()
-    $responseBody = $reader.ReadToEnd();
-    Write-Host "Response content:`n$responseBody" -f Red
-    Write-Error "Request to $Uri failed with HTTP Status $($ex.Response.StatusCode) $($ex.Response.StatusDescription)"
-    write-host
-    break
-
-    }
-
-}
 
 ####################################################
 
-Function Get-DEPOnboardingSettings {
 
-<#
-.SYNOPSIS
-This function retrieves the DEP onboarding settings for your tenant. DEP Onboarding settings contain information such as Token ID, which is used to sync DEP and VPP
-.DESCRIPTION
-The function connects to the Graph API Interface and gets a retrieves the DEP onboarding settings.
-.EXAMPLE
-Get-DEPOnboardingSettings
-Gets all DEP Onboarding Settings for each DEP token present in the tenant
-.NOTES
-NAME: Get-DEPOnboardingSettings
-#>
-
-[cmdletbinding()]
-
-Param(
-[parameter(Mandatory=$false)]
-[string]$tokenid
-)
-
-$graphApiVersion = "beta"
-
-    try {
-
-        if ($tokenid){
-        
-        $Resource = "deviceManagement/depOnboardingSettings/$tokenid/"
-        $uri = "https://graph.microsoft.com/$graphApiVersion/$($Resource)"
-        (Invoke-RestMethod -Uri $uri –Headers $authToken –Method Get)
-                
-        }
-
-        else {
-        
-        $Resource = "deviceManagement/depOnboardingSettings/"
-        $uri = "https://graph.microsoft.com/$graphApiVersion/$($Resource)"
-        (Invoke-RestMethod -Uri $uri –Headers $authToken –Method Get).value
-        
-        }
-               
-    }
-    
-    catch {
-
-    $ex = $_.Exception
-    $errorResponse = $ex.Response.GetResponseStream()
-    $reader = New-Object System.IO.StreamReader($errorResponse)
-    $reader.BaseStream.Position = 0
-    $reader.DiscardBufferedData()
-    $responseBody = $reader.ReadToEnd();
-    Write-Host "Response content:`n$responseBody" -f Red
-    Write-Error "Request to $Uri failed with HTTP Status $($ex.Response.StatusCode) $($ex.Response.StatusDescription)"
-    write-host
-    break
-
-    }
-
-} 
 
 ####################################################
 
